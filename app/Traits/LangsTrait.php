@@ -2,47 +2,46 @@
 
 namespace App\Traits;
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
 trait LangsTrait
 {
     public function getFieldValueByLang($field, $code)
     {
-        $value = $this->$field;
-
-        if (empty($value)) {
+        $table = $this->getTable();
+        $table_lang = $table.'_'.$code;
+        if (!Schema::hasTable($table_lang)) {
             return null;
         }
-
-        $json = json_decode($value, true);
-
-        if ($json === null) {
-            return $json;
-        }
-
-        if (isset($json[$code])) {
-            return $json[$code];
-        }
+        $row = DB::table($table_lang)->find($this->id);
+        $value = $row->$field;
+        return $value;
     }
 
     public function setFieldValueByLang($field, $code, $new_value) : bool
     {
-        $value = $this->$field;
-
-        if (empty($value)) {
-            $json = [];
-        } else {
-            $json = json_decode($value, true);
-
-            if ($json === null) {
-                return false;
-            }
-            if (!is_array($json)) {
-                return false;
-            }
+        $table = $this->getTable();
+        if (!Schema::hasTable($table)) {
+            return false;
         }
-
-        $json[$code] = $new_value;
-
-        $this->$field = json_encode($json);
+        $table_lang = $table.'_'.$code;
+        if (!Schema::hasTable($table_lang)) {
+            Schema::create($table_lang, function (Blueprint $table) {
+                $table->unsignedBigInteger('id')->unique();
+                $table->string('title')->nullable();
+                $table->string('content')->nullable();
+            });
+        }
+        $row = DB::table($table_lang)->find($this->id);
+        if (!$row) {
+            $row = [
+                'id' => $this->id,
+            ];
+        }
+        $row[$field] = $new_value;
+        DB::table($table_lang)->updateOrInsert($row);
         return true;
     }
 }
