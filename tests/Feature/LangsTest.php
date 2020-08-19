@@ -26,8 +26,6 @@ class LangsTest extends TestCase
         $en = $this->post->getFieldValueByLang('title', 'en');
         $ru = $this->post->getFieldValueByLang('title', 'ru');
 
-        var_dump($en);
-        var_dump($ru);
         $this->assertTrue($en === 'My title');
         $this->assertTrue($ru === 'Мой заголовок');
     }
@@ -37,5 +35,18 @@ class LangsTest extends TestCase
         $ua = $this->post->getFieldValueByLang('title', 'ua');
 
         $this->assertTrue($ua === null);
+    }
+
+    public function testPostGetNotSaved()
+    {
+        $this->post->setFieldValueByLang('title', 'ua', 'Мій заголовок');
+        $ua = $this->post->getFieldValueByLang('title', 'ua');
+
+        $this->assertTrue($ua === 'Мій заголовок');
+
+        $this->post = Post::orderBy('id', 'DESC')->first();
+        $ua = $this->post->getFieldValueByLang('title', 'ua');
+
+        $this->assertTrue($ua !== 'Мій заголовок');
     }
 }

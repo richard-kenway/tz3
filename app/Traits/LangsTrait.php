@@ -17,6 +17,11 @@ trait LangsTrait
 
     public function getFieldValueByLang($field, $code)
     {
+        $last = $this->getChangedLast($field, $code);
+        if ($last !== null) {
+            return $last['new_value'];
+        }
+
         $table = $this->getTable();
         $table_lang = $table.'_'.$code;
 
@@ -74,5 +79,16 @@ trait LangsTrait
             DB::table($table_lang)->updateOrInsert($row);
         }
         return true;
+    }
+
+    protected function getChangedLast($field, $code)
+    {
+        $changed_all = [];
+        foreach ($this->changed as $changed) {
+            if ($changed['field'] == $field && $changed['code'] == $code) {
+                $changed_all[] = $changed;
+            }
+        }
+        return array_pop($changed_all);
     }
 }
