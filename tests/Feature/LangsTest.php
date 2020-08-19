@@ -49,4 +49,18 @@ class LangsTest extends TestCase
 
         $this->assertTrue($ua !== 'Мій заголовок');
     }
+
+    public function testPostGetLast()
+    {
+        $this->post->setFieldValueByLang('title', 'ua', 'Мій заголовок');
+        $this->post->setFieldValueByLang('title', 'ua', 'Мій заголовок2');
+        $ua = $this->post->getFieldValueByLang('title', 'ua');
+
+        $this->assertTrue($ua === 'Мій заголовок2');
+
+        $this->post->setFieldValueByLang('title', 'ru', 'Мой заголовок2');
+        $ru = $this->post->getFieldValueByLang('title', 'ru');
+
+        $this->assertTrue($ru === 'Мой заголовок2');
+    }
 }
