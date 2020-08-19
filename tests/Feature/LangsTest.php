@@ -22,10 +22,12 @@ class LangsTest extends TestCase
         $this->post = new Post();
         $this->post->setFieldValueByLang('title', 'en', 'My title');
         $this->post->setFieldValueByLang('title', 'ru', 'Мой заголовок');
+        $this->post->save();
         $en = $this->post->getFieldValueByLang('title', 'en');
         $ru = $this->post->getFieldValueByLang('title', 'ru');
-        $this->post->save();
 
+        var_dump($en);
+        var_dump($ru);
         $this->assertTrue($en === 'My title');
         $this->assertTrue($ru === 'Мой заголовок');
     }
@@ -35,22 +37,5 @@ class LangsTest extends TestCase
         $ua = $this->post->getFieldValueByLang('title', 'ua');
 
         $this->assertTrue($ua === null);
-    }
-
-    public function testPostGetNotJson()
-    {
-        $this->post->content = 'asdf';
-        $this->post->save();
-        $ua = $this->post->getFieldValueByLang('content', 'ua');
-
-        $this->assertTrue($ua === null);
-    }
-
-    public function testPostSetNotJson()
-    {
-        $ua = $this->post->setFieldValueByLang('content', 'ua', 'Україна');
-        $this->post->save();
-
-        $this->assertTrue($ua === false);
     }
 }
